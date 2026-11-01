@@ -1,0 +1,74 @@
+groups:
+  - name: host_alerts
+    rules:
+      # Host down
+      - alert: HostDown
+        expr: up{job="node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host is unreachable"
+          description: "Node Exporter on the host has been down for more than 2 minutes."
+
+      # High CPU load (> 85% for 5 minutes)
+      - alert: HostHighCpuLoad
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected (instance {{ $labels.instance }})"
+          description: "CPU usage is above 85% for more than 5 minutes. Current value: {{ $value | printf \"%.2f\" }}%"
+
+      # High Memory Usage (> 90% for 5 minutes)
+      - alert: HostOutOfMemory
+        expr: ((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host high memory usage (instance {{ $labels.instance }})"
+          description: "Host memory usage is above 90% for more than 5 minutes. Current value: {{ $value | printf \"%.2f\" }}%"
+
+      # Disk space filling (> 85% used)
+      - alert: HostDiskAlmostFull
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host disk space almost full (mount: {{ $labels.mountpoint }})"
+          description: "Less than 15% disk space remaining on {{ $labels.mountpoint }}."
+
+  - name: container_alerts
+    rules:
+      # cAdvisor down
+      - alert: CadvisorDown
+        expr: up{job="cadvisor"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "cAdvisor service is down"
+          description: "cAdvisor target has disappeared or is down."
+
+      # High Container CPU
+      - alert: ContainerHighCpuUsage
+        expr: (sum by(name) (rate(container_cpu_usage_seconds_total{name!=""}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} high CPU"
+          description: "Container {{ $labels.name }} is using > 80% CPU for more than 5 minutes."
+
+      # Container Memory Pressure (> 85% limit)
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} > 0.85) and (container_spec_memory_limit_bytes{name!=""} > 0)
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} approaching memory limit"
+          description: "Container {{ $labels.name }} is using more than 85% of its allocated memory."

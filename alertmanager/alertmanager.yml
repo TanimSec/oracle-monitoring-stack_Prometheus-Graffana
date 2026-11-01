@@ -1,0 +1,38 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'job', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+
+receivers:
+  - name: 'default-receiver'
+    # By default, alerts are logged in Alertmanager.
+    # To route to Discord, Telegram, Slack, or Email, uncomment and configure below:
+
+    # --- Discord Example ---
+    # webhook_configs:
+    #   - url: 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL/slack'
+    #     send_resolved: true
+
+    # --- Telegram Example ---
+    # telegram_configs:
+    #   - bot_token: 'YOUR_TELEGRAM_BOT_TOKEN'
+    #     chat_id: 123456789
+    #     send_resolved: true
+
+    # --- Slack Example ---
+    # slack_configs:
+    #   - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+    #     channel: '#alerts'
+    #     send_resolved: true
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
