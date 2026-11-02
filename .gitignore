@@ -9,3 +9,4 @@ Thumbs.db
 
 # Persistent local data (if run locally)
 data/
+.gravitas/

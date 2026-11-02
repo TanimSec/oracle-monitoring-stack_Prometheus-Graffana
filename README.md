@@ -14,7 +14,7 @@ A production-grade, lightweight, and fully integrated observability stack optimi
 | **Loki** | Centralized Docker container & host log storage | Internal (3100) | 512 MB |
 | **Promtail** | Automatically ships Docker & syslog to Loki | Internal (9080) | 128 MB |
 | **Alertmanager** | Alert routing (Discord, Telegram, Slack, Webhook) | Internal (9093) | 128 MB |
-| **Grafana** | Unified observability dashboard (Prometheus + Loki) | `3000` (Web UI) | 512 MB |
+| **Grafana** | Unified observability dashboard (Prometheus + Loki) | `3002` (Web UI) | 512 MB |
 | **Uptime Kuma** | Real-time website, ping, and SSL expiration monitoring | `3001` (Web UI) | 384 MB |
 
 > **Resource Budgeting**: Under peak load, this entire stack consumes less than **2.8 GB RAM** (typically ~1 GB at idle), leaving over **9 GB RAM** and plenty of CPU available on your 12 GB VM for Dokploy, your databases (PostgreSQL, Redis), and client applications.
@@ -73,7 +73,7 @@ In the Dokploy application settings, go to the **Environment** tab and add:
 ```env
 GRAFANA_ADMIN_USER=admin
 GRAFANA_ADMIN_PASSWORD=SetYourVeryStrongPasswordHere!
-GRAFANA_PORT=3000
+GRAFANA_PORT=3002 # Host port (avoid 3000 to prevent conflict with Dokploy dashboard)
 UPTIME_KUMA_PORT=3001
 PROMETHEUS_RETENTION_TIME=15d
 LOKI_RETENTION_TIME=168h
@@ -122,7 +122,7 @@ Prometheus communicates with Node Exporter internally via Docker's host gateway 
 
 ## 📊 Grafana Setup & Recommended Dashboards
 
-When you open Grafana (`https://monitor.yourdomain.com` or `http://<SERVER_IP>:3000`):
+When you open Grafana (`https://monitor.yourdomain.com` or `http://<SERVER_IP>:3002`):
 
 1. **Datasources are Pre-Configured**:
    - **Prometheus** (Default metrics source) is already registered and ready.

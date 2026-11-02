@@ -44,6 +44,11 @@ scrape_configs:
       - targets: ['alertmanager:9093']
 
   # 6. Uptime Kuma (Uptime status & monitor metrics)
+  # NOTE: Uptime Kuma requires Basic Auth or an API Key for /metrics.
+  # After setup, generate an API key in Uptime Kuma (Settings -> API Keys) and add:
+  # basic_auth:
+  #   username: ""
+  #   password: "<YOUR_UPTIME_KUMA_API_KEY>"
   - job_name: 'uptime-kuma'
     metrics_path: '/metrics'
     static_configs:
