@@ -116,7 +116,7 @@ If your host has UFW enabled, protect Node Exporter:
 ```bash
 sudo ufw deny 9100/tcp
 ```
-Prometheus communicates with Node Exporter internally via Docker's host gateway (`host.docker.internal:9100`).
+Prometheus communicates with Node Exporter internally via Docker's isolated network (`node-exporter:9100`), with zero host firewall dependencies.
 
 ---
 

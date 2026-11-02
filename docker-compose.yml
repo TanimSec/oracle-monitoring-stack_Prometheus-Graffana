@@ -15,8 +15,8 @@ services:
       - prometheus_data:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/rules:/etc/prometheus/rules:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+
+
     networks:
       - monitoring
     expose:
@@ -39,7 +39,10 @@ services:
     image: prom/node-exporter:v1.8.2
     container_name: node-exporter
     restart: unless-stopped
-    network_mode: host
+    networks:
+      - monitoring
+    expose:
+      - "9100"
     pid: host
     command:
       - '--path.procfs=/host/proc'
